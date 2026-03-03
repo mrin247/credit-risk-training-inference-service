@@ -4,12 +4,24 @@ Handles target remapping (1→0 Good, 2→1 Bad), splitting features from
 the target, encoding categoricals with OrdinalEncoder, and scaling
 numerics with StandardScaler.
 
-Design choice — OrdinalEncoder over OneHotEncoder:
-  Tree-based models (RandomForest, XGBoost, LightGBM) work well with
-  ordinal-encoded categoricals and don't require one-hot expansion.
-  This keeps dimensionality low (20 features instead of 50+) and avoids
-  sparse matrix overhead.  If the model were swapped to Logistic
-  Regression, OneHotEncoder would be the better default.
+Design choice — categorical encoding strategy:
+  The raw german.data file uses opaque category codes (e.g. A11, A30,
+  A40) rather than human-readable labels.  We treat these as opaque
+  categoricals and encode them numerically with OrdinalEncoder, rather
+  than mapping them to meaningful labels first.  Rationale:
+
+  1. The tree-based models we use (RandomForest) split on threshold
+     values, so ordinal encoding is sufficient — they don't assume any
+     ordering relationship between encoded integers.
+  2. Keeping codes opaque avoids maintaining a fragile hand-written
+     mapping table that could go out of sync with the data.
+  3. OrdinalEncoder keeps dimensionality low (20 features instead of
+     50+ with OneHotEncoder) and avoids sparse matrix overhead.
+
+  Trade-off: if the model were swapped to Logistic Regression or
+  another linear model, OneHotEncoder with human-readable labels would
+  be the better default, since linear models *do* interpret magnitude
+  relationships between encoded integers.
 """
 
 import logging

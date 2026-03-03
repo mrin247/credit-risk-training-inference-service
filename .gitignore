@@ -35,3 +35,11 @@ mlflow.db
 
 # Environment
 .env
+
+# Local MLflow
+mlflow/
+# Local MinIO
+minio/
+
+# Local data files
+data/

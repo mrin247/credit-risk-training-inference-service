@@ -53,19 +53,22 @@ def configure_mlflow(config: dict[str, Any]) -> None:
 
     Environment variables for boto3 (used by MLflow for S3 access) are
     set here so that ``mlflow.sklearn.log_model`` can write artifacts
-    directly to MinIO.
+    directly to MinIO.  When no ``minio`` section is present in the
+    config, S3 env vars are skipped and MLflow uses local artifact
+    storage instead.
     """
     mlflow_cfg = config["mlflow"]
-    minio_cfg = config["minio"]
-
     mlflow.set_tracking_uri(mlflow_cfg["tracking_uri"])
-
-    os.environ["MLFLOW_S3_ENDPOINT_URL"] = minio_cfg["endpoint_url"]
-    os.environ["AWS_ACCESS_KEY_ID"] = minio_cfg["access_key"]
-    os.environ["AWS_SECRET_ACCESS_KEY"] = minio_cfg["secret_key"]
-
     logger.info("MLflow tracking URI: %s", mlflow_cfg["tracking_uri"])
-    logger.info("MinIO endpoint: %s", minio_cfg["endpoint_url"])
+
+    minio_cfg = config.get("minio")
+    if minio_cfg:
+        os.environ["MLFLOW_S3_ENDPOINT_URL"] = minio_cfg["endpoint_url"]
+        os.environ["AWS_ACCESS_KEY_ID"] = minio_cfg["access_key"]
+        os.environ["AWS_SECRET_ACCESS_KEY"] = minio_cfg["secret_key"]
+        logger.info("MinIO endpoint: %s", minio_cfg["endpoint_url"])
+    else:
+        logger.info("No MinIO config found; using local artifact storage")
 
 
 def run() -> None:
