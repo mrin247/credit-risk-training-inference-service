@@ -29,7 +29,7 @@ def fetch_data(url: str, column_names: list[str]) -> pd.DataFrame:
         ValueError: If the downloaded data doesn't match the expected schema.
     """
     logger.info("Downloading dataset from %s", url)
-    response = requests.get(url, timeout=30)
+    response = requests.get(url, timeout=180)
     response.raise_for_status()
 
     df = pd.read_csv(
