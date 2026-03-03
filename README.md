@@ -14,9 +14,7 @@ A config-driven ML training pipeline and inference service for credit risk class
 
 5. **OrdinalEncoder for categoricals** — Simpler than OneHot for tree-based models, documented trade-off.
 
-
-
-MinIO bucket init — Separate init container ensures bucket exists before MLflow starts.
+6. **MinIO bucket init** — Separate init container ensures bucket exists before MLflow starts.
 
 ## Run with Docker
 
