@@ -4,9 +4,19 @@ A config-driven ML training pipeline and inference service for credit risk class
 
 ## Design Decisions
 
-1. **sklearn Pipeline as single artifact** — Preprocessing (OrdinalEncoder + StandardScaler) and the classifier are wrapped in one `sklearn.Pipeline`, so the saved model is fully self-contained and inference needs no separate transformer files.
-2. **OrdinalEncoder for categoricals** — Tree-based models don't need one-hot encoding; ordinal encoding keeps dimensionality low (22 vs 50+ columns) and avoids sparse matrices. Raw category codes (A11, A30, etc.) are treated as opaque categoricals.
-3. **Config-driven pipeline** — All parameters (URLs, feature lists, hyperparameters, MLflow/MinIO settings) live in `config/config.yaml` with zero hardcoded values in source code.
+1. **sklearn Pipeline wrapping** — Preprocessing + model in a single Pipeline object so the artifact is self-contained and inference doesn't need separate transformer files.
+
+2. **Config-driven** — YAML config externalized; override via env vars in Docker for flexibility.
+
+3. **FastAPI + Pydantic** — Strong input validation with automatic 422 error responses.
+
+4. **RandomForest default** — Good out-of-the-box performance on small tabular data, no hyperparameter search needed (assignment says this is fine).
+
+5. **OrdinalEncoder for categoricals** — Simpler than OneHot for tree-based models, documented trade-off.
+
+
+
+MinIO bucket init — Separate init container ensures bucket exists before MLflow starts.
 
 ## Run with Docker
 
