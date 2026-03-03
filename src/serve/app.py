@@ -66,8 +66,9 @@ def load_model_from_registry(config: dict[str, Any]) -> tuple[Any, str]:
 
     from mlflow.tracking import MlflowClient
     client = MlflowClient()
-    latest_versions = client.get_latest_versions(model_name)
-    version = latest_versions[0].version if latest_versions else "unknown"
+    filter_string = f"name='{model_name}'"
+    results = client.search_model_versions(filter_string, max_results=1, order_by=["version_number DESC"])
+    version = results[0].version if results else "unknown"
 
     logger.info("Loaded model '%s' version %s", model_name, version)
     return model, version
